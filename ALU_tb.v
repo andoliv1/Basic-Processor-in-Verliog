@@ -73,9 +73,48 @@ initial begin
    ctrl = 6'b000111;
    #10
    $display("ALU Result 4 & -1: %d",result);
-
-  
- 
+   #10
+   ctrl = 6'b011111;
+   branch_op = 1'b1;
+   opB = 3;
+   #10
+   $display("ALU Result (should be 4) jal: %d", result);
+   $display("Branch Result (should be 1) jal: %b", branch);
+   #10
+   ctrl = 6'b111111;
+   #10
+   $display("ALU Result (should be 4) jalr: %d", result);
+   $display("Branch Result (should be 1) jalr: %b", branch);
+   #10
+   ctrl = 6'b010000;
+   #10
+   $display("ALU Result (should be 0) beq: %d", result);
+   $display("Branch Result (should be 1) beq: %b", branch);
+   #10
+   ctrl = 6'b010001;
+   #10
+   $display("ALU Result (should be 1) bne: %d", result);
+   $display("Branch Result (should be 1) bne: %b", branch);
+   #10
+   ctrl = 6'b010100;
+   #10
+   $display("ALU Result (should be 0) blt: %d", result);
+   $display("Branch Result (should be 1) bgeu: %b", branch);
+   #10
+   ctrl = 6'b010101;
+   #10
+   $display("ALU Result (should be 1) bge: %d", result);
+   $display("Branch Result (should be 0) bge: %b", branch);
+   #10
+   ctrl = 6'b010110;
+   #10
+   $display("ALU Result (should be 0) bltu: %d", result);
+   $display("Branch Result (should be 1) bltu: %b", branch);
+   #10
+   ctrl = 6'b010111;
+   #10
+   $display("ALU Result (should be 1) bgeu: %d", result);
+   $display("Branch Result (should be 1) bgeu: %b", branch);
 
   // Add other test cases here
   //
