@@ -6,6 +6,8 @@ module ALU (
   input [5:0]  ALU_Control,
   input [31:0] operand_A,
   input [31:0] operand_B,
+  input branch_op,
+  output branch,
   output [31:0] ALU_result
 );
 //reg [31:0] out temp;
@@ -18,8 +20,8 @@ assign out= (ALU_Control== 6'b000000)? a_sign+ b_sign:
             (ALU_Control== 6'b000100)? operand_A ^ operand_B:
             (ALU_Control== 6'b000111)? operand_A & operand_B:
             (ALU_Control== 6'b000010)? SLT:
-            32'b00000000000000000000000000000000;
-        
+            (ALU_Control== 6'b000000? 
+            32'b00000000000000000000000000000000;     
 assign ALU_result=out;
 /******************************************************************************
 *                      Start Your Code Here

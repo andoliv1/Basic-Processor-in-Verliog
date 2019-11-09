@@ -6,13 +6,16 @@ module ALU_tb();
 
 reg [5:0] ctrl;
 reg [31:0] opA, opB;
-
+reg branch_op;
+wire branch;
 wire signed [31:0] result;
 
 ALU dut (
   .ALU_Control(ctrl),
   .operand_A(opA),
   .operand_B(opB),
+  .branch_op(branch_op),
+  .branch(branch),
   .ALU_result(result)
 );
 
