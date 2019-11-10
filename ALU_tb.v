@@ -115,6 +115,35 @@ initial begin
    #10
    $display("ALU Result (should be 1) bgeu: %d", result);
    $display("Branch Result (should be 1) bgeu: %b", branch);
+   ctrl=6'b000110;
+   #10
+   $display("ALU Result 4 | -1: %d",result);
+   #10
+   ctrl=6'b000101;
+   opA=24;
+   opB = 3;
+   #10
+   $display("ALU Result 24 and 3 shift right : %d",result);
+   #10
+   ctrl=6'b000001;
+   opB=1;
+   #10
+   $display("ALU Result 24 and 1 shift left : %d",result);
+   #10
+   ctrl=6'b001101;
+   opB = 1;
+   #10
+   $display("ALU Result 24 and 1 arithmetic right : %d",result);
+   #10
+   opA = 32'hb0000000;
+   opB = 2;
+   ctrl=6'b001101;
+   #10
+   $display("ALU Result -1342177280 and 2 arithmetic right : %d",result);// the sign isn't being preserved ask 
+   #10
+   ctrl=6'b000101;
+   #10
+   $display("ALU Result -1342177280 and 2 shift right : %d",result);
 
   // Add other test cases here
   //

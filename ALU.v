@@ -15,12 +15,11 @@ wire signed [31:0] a_sign, b_sign, out,SLT;
 assign a_sign=operand_A;
 assign b_sign=operand_B;
 assign SLT=a_sign<b_sign;
-assign out= (ALU_Control== 6'b000000)? a_sign+ b_sign:
-            (ALU_Control== 6'b001000)?a_sign - b_sign:
-            (ALU_Control== 6'b000100)? operand_A ^ operand_B:
-            (ALU_Control== 6'b000111)? operand_A & operand_B:
-            (ALU_Control== 6'b000010)? SLT:
-            (ALU_Control== 6'b000000)? a_sign + b_sign: 
+assign out= (ALU_Control== 6'b000000)? a_sign+ b_sign: //ADD, ADDI
+            (ALU_Control== 6'b001000)? a_sign - b_sign://SUB
+            (ALU_Control== 6'b000100)? operand_A ^ operand_B://XOR
+            (ALU_Control== 6'b000111)? operand_A & operand_B://AND ANDI
+            (ALU_Control== 6'b000010)? SLT://SLT 
             (ALU_Control== 6'b011111)? a_sign: //JAL
             (ALU_Control== 6'b111111)? a_sign: //JALR
             (ALU_Control== 6'b010000)? (a_sign == b_sign): //BEQ
@@ -30,6 +29,10 @@ assign out= (ALU_Control== 6'b000000)? a_sign+ b_sign:
             (ALU_Control== 6'b010110)? (operand_A < operand_B): //BLTU
             (ALU_Control== 6'b010111)? (operand_A >= operand_B): //BGEU
             (ALU_Control== 6'b000011)? SLT: //SLTI
+	        (ALU_Control== 6'b001101)? (a_sign>>>operand_B)://SRA, SRAI                                                                                                                     
+            (ALU_Control== 6'b000101)? (operand_A>>operand_B)://SRL, SRLI                                                                                                                   
+            (ALU_Control== 6'b000001)? (operand_A<<operand_B)://SLL, SLLI                                                                                                                   
+            (ALU_Control== 6'b000110)? operand_A | operand_B://ORI                         	
             32'b00000000000000000000000000000000;
             
 assign branch = (branch_op == 1'b1)? 1'b1: 1'b0;
