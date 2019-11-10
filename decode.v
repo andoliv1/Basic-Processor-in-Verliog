@@ -228,10 +228,10 @@ case(opcode)
             next_PC_select_1 = 1;
             branch_op_1 = 0;
             wEn_1 = 1;
-            wb_sel_1 = 1;
+            wb_sel_1 = 0;
             mem_wEn_1 = 0;
-            op_A_sel_1 = 2'b01;
-            op_B_sel_1 = 1;
+            op_A_sel_1 = 2'b10; //ASK Novak
+            op_B_sel_1 = 1; //ASK Novak
             imm32_1 = uj_imm_32;
             ALU_Control_1 = 6'b111111;
             end
@@ -239,19 +239,19 @@ case(opcode)
             begin
             next_PC_select_1 = 1;
             branch_op_1 = 0;
-            wEn_1 = 0;
+            wEn_1 = 1;
             wb_sel_1 = 0;
             mem_wEn_1 = 0;
-            op_A_sel_1 = 2'b01;
-            op_B_sel_1 = 1;
+            op_A_sel_1 = 2'b10; //Ask NOvak
+            op_B_sel_1 = 1; //Ask Novak
             imm32_1 = uj_imm_32;
             ALU_Control_1 =6'b011111;
             end
           AUIPC:
             begin
-            next_PC_select_1 = 0;
+            next_PC_select_1 = 1;
             branch_op_1 = 0;
-            wEn_1 = 0;
+            wEn_1 = 1;
             wb_sel_1 = 0;
             mem_wEn_1 = 0;
             op_A_sel_1 = 2'b01;
