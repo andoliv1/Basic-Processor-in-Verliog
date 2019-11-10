@@ -51,13 +51,13 @@ localparam [6:0]R_TYPE  = 7'b0110011,
 
 // These are internal wires that I used. You can use them but you do not have to.
 // Wires you do not use can be deleted.
-wire[6:0]  s_imm_msb;
-wire[4:0]  s_imm_lsb;
-wire[19:0] u_imm;
-wire[11:0] i_imm_orig;
-wire[19:0] uj_imm;
-wire[11:0] s_imm_orig;
-wire[12:0] sb_imm_orig;
+wire[6:0]  s_imm_msb;//for s_type
+wire[4:0]  s_imm_lsb;// for s_type
+wire[19:0] u_imm;//for u_type
+wire[11:0] i_imm_orig;//for i_type
+wire[19:0] uj_imm;//for j_type
+wire[11:0] s_imm_orig;// not currently using 
+wire[12:0] sb_imm_orig;// for b_type
 
 wire[31:0] sb_imm_32;
 wire[31:0] u_imm_32;
@@ -85,7 +85,37 @@ assign funct3 = instruction[14:12];
 /* Write register */
 assign write_sel = instruction[11:7];
 
+ 
+ 
+ assign s_imm_msb=instruction[31:25];
+ assign s_imm_lsb=instruction[11:7];
+ assign u_imm=instruction[31:12];
+ assign i_imm_orig= instruction[31:20];
+ assign uj_imm={instruction[31],instruction[21:12],instruction[22],instruction[30:23]};
+ assign sb_imm_orig={instruction[31],instruction[7],instruction[30:25],instruction[11:8]};
 
+always@(*)
+begin 
+case(opcode)
+    R_TYPE:
+        begin
+        next_PC_select=0;
+        branch_op=0;
+        wEn=1;
+        mem_wEn=0;
+        op_A_sel=2'b00;
+        op_B_sel=0;
+        if(funct3==3'b000)
+        begin 
+            if(funct7==7'b0)
+            ALU_Control=6'b0;
+            else
+            ALU_C
+            
+         
+        end
+    
+    
 /******************************************************************************
 *                      Start Your Code Here
 ******************************************************************************/
