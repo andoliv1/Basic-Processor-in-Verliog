@@ -1,5 +1,5 @@
-// Name: Your Name
-// BU ID: Your ID
+// Name: Layan Bahaidarah Andreas Francisco
+// BU ID: U26666743 U85066104
 // EC413 Project: Decode Test Bench
 
 module decode_tb();
@@ -27,10 +27,11 @@ wire wEn;
 
 // Outputs to Execute/ALU
 wire branch_op; // Tells ALU if this is a branch instruction
-wire [31:0] imm32;
+wire signed [31:0] imm32;
 wire [1:0] op_A_sel;
 wire op_B_sel;
 wire [5:0] ALU_Control;
+wire result;
 
 // Outputs to Memory
 wire mem_wEn;
@@ -76,6 +77,16 @@ decode #(
 );
 
 
+//ALU dut (
+//  .ALU_Control(ALU_Control),
+//  .operand_A(op_A_sel),
+//  .operand_B(opB),
+//  .branch_op(branch_op),
+//  .branch(branch),
+//  .ALU_result(result)
+//);
+
+
 
 task print_state;
   begin
@@ -112,14 +123,14 @@ initial begin
   JALR_target = 0;
   branch      = 0;
 
-  #10
+  #20
   // Display output of NOP instruction
   $display("addi zero, zero, 0");
   print_state();
   // Test a new instruction
   instruction = 32'b111111111111_00000_000_01011_0010011; // addi a1, zero, -1
 
-  #10
+  #20
   // Here we are printing the state of the register file.
   // We should see the result of the add a6, a1, a2 instruction but not the
   // sub a7, a2, a4 instruction because there has not been a posedge clock yet
@@ -127,42 +138,43 @@ initial begin
   print_state();
   instruction = 32'b0000000_01100_01011_000_10000_0110011; // add a6, a1, a2
 
-  #10
+  #20
   $display("add a6, a1, a2");
   print_state();
   instruction = 32'b0100000_01110_01100_000_10001_0110011; // sub a7, a2, a4
 
-  #10
+  #20
   $display("sub a7, a2, a4");
   print_state();
   instruction = 32'b0000000_01111_01011_010_01010_0110011; // slt a0, a1, a5
 
-  #10
+  #20
   $display("slt a0, a1, a5");
   print_state();
   instruction = 32'b0000000_01111_01011_100_01110_0110011; // xor a4, a1, a5
 
-  #10
+  #20
   $display("xor a4, a1, a5");
   print_state();
   instruction = 32'b0000000_01011_01101_111_01101_0110011; // and a3, a3, a1
 
-  #10
+  #20
   $display("and a3, a3, a1");
   print_state();
   instruction = 32'b011000000000_00000_000_01011_0010011; // addi a1, zero, 1536
+  
+  #20
+    $display("addi a1, zero, 1536");
+    print_state();
 
-  #10
-  $display("addi a1, zero, 1536");
-  print_state();
   instruction = 32'b0000000_01100_01011_010_00000_0100011; // sw a2, 0(a1);
 
-  #10
+  #20
   $display("sw a2, 0(a1)");
   print_state();
   instruction = 32'b000000000000_01011_010_10010_0000011; // lw s2, 0(a1);
 
-  #10
+  #20
   $display("lw s2, 0(a1)");
   print_state();
   instruction = NOP;
@@ -170,7 +182,7 @@ initial begin
   PC = 16'h0114;
   instruction = 32'h0140006f; //jal	zero,128 (Should jump to 0x128)
 
-  #10
+  #20
   $display("jal	zero,128");
   print_state();
 
@@ -178,15 +190,60 @@ initial begin
   PC = 16'h0094;
   instruction = 32'h0c4080e7; // jalr ra,196(ra) (should jump to ra+0x196)
 
-  #10
+  #20
   $display("jalr ra,196(ra)");
   print_state();
 
 /******************************************************************************
 *                     Add Test Cases Here
 ******************************************************************************/
+  instruction = 32'b0001000__01101_01011_000_00000_1100011; // beq a3,a1,128
+  branch = 1'b1;
+  #20
+  $display("beq a3,a1,128 ");
+  print_state();
+  instruction = 32'b0000011_01100_01011_010_00001_0100011; // sw a2, 0(a1);
+  #20
+  $display("sw a2, 97(a1)");
+  print_state(); 
+  instruction = 32'b00000000000001011010_00111_0010111; // auipc x7, 90
+  #20
+  $display("auipc x7, 90)");
+  print_state();
+  instruction = 32'b00000000000000011000_00001_0110111; // LUI a1, 24
+  #20
+  $display("LUI a1,24 ");
 
-  #10
+   print_state();
+   instruction = 32'b0000000_01100_01111_001_10010_0110011; // SLL x18, x12, x15
+ 
+   #20
+   $display("sll x18, x12, x15");
+   
+    print_state();
+     instruction = 32'b0001100_01101_01011_100_00001_1100011; // blt a3,a1,384
+   
+     #20
+     $display("blt a3, a1, 2432");
+     
+    print_state();
+    instruction = 32'b100000101011_00111_111_00111_0010011; // andi x7, x7, -2005
+     
+    #20
+    $display("andi x7, x7, -2005");
+    print_state();
+    instruction = 32'b0100000_00111_01011_101_01110_0110011; // sra x14, x11, x7
+       
+    #20
+    $display("sra x14, x11, x7");
+    print_state();
+    
+    instruction = 32'b0100000_11111_01011_101_01110_0010011; // srai x14, x11, 32
+           
+    #20
+    $display("srai x14, x11, 31");
+    print_state();
+  
   $stop();
 end
 

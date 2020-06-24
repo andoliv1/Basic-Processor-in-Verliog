@@ -1,5 +1,5 @@
-// Name: Layan Bahaidarah   
-// BU ID: U26666743
+// Name: Layan Bahaidarah Andreas Francisco
+// BU ID: U26666743 U85066104
 // EC413 Lab 2 Problem 1: Register File Test Bench
 
 

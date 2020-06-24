@@ -1,5 +1,5 @@
-  // Name: Your Name
-// BU ID: Your ID
+// Name: Layan Bahaidarah Andreas Francisco
+// BU ID: U26666743 U85066104
 // EC413 Project: Decode Module
 
 module decode #(
@@ -85,203 +85,166 @@ assign funct3 = instruction[14:12];
 /* Write register */
 assign write_sel = instruction[11:7];
 
- 
- 
- assign s_imm_msb=instruction[31:25];
- assign s_imm_lsb=instruction[11:7];
- assign u_imm=instruction[31:12];
- assign i_imm_orig= instruction[31:20];
- assign uj_imm={instruction[31],instruction[21:12],instruction[22],instruction[30:23]};
- assign sb_imm_orig={instruction[31],instruction[7],instruction[30:25],instruction[11:8]};
- 
- assign s_imm_32={{20{s_imm_msb[6]}},s_imm_msb,s_imm_lsb};
- assign u_imm_32={{12{u_imm[19]}},u_imm};
- assign i_imm_32={{20{i_imm_orig[11]}},i_imm_orig};
- assign uj_imm={{12{uj_imm[19]}},uj_imm};
- assign sb_imm_32={{20{sb_imm_orig[11]}},sb_imm_orig};
+wire[4:0] shamt;
+wire[31:0] shamt_32;
 
-reg next_PC_select_1,branch_op_1,wEn_1,wb_sel_1,mem_wEn_1,op_B_sel_1;
-reg[1:0] op_A_sel_1;
-reg[31:0] imm32_1;
-reg[5:0] ALU_Control_1;
-always@(*)
-begin 
-case(opcode)
-   R_TYPE:
-   begin
-       next_PC_select_1=0;
-       branch_op_1=0;
-       wEn_1=1;
-       wb_sel_1=0;
-       mem_wEn_1=0;
-       op_A_sel_1=2'b00;
-       op_B_sel_1=0;
-       imm32_1=32'b0;
-       if(funct3==3'b000)
-       begin
-           if(funct7==7'b0)
-           ALU_Control_1=6'b0;//add
-           else
-           ALU_Control_1=6'b001000;//sub
-       end
-       else if(funct3==3'b111)
-           ALU_Control_1=6'b000111;//and
-       else if(funct3==3'b110)
-           ALU_Control_1=6'b000110;//or
-       else if(funct3==3'b010)
-           ALU_Control_1=6'b000010;//slt
-       else if(funct3==3'b001)
-           ALU_Control_1=6'b000001;//sll
-       else if(funct3==3'b011)
-          ALU_Control_1=6'b000010;//sltu
-       else if(funct3==3'b100)
-           ALU_Control_1=6'b000100;//xor
-       else if(funct3==3'b101)
-       begin
-           if(funct7==7'b0)
-           ALU_Control_1=6'b000101;//srl
-           else
-           ALU_Control_1=6'b001101;//sra
-       end
-   end
-   I_TYPE:
-   begin
-       next_PC_select_1=0;
-       branch_op_1=0;
-       wEn_1=1;
-       wb_sel_1=0;
-       mem_wEn_1=0;
-       op_A_sel_1=2'b00;
-       op_B_sel_1=1;//make sure if 1 or 0
-       imm32_1=i_imm_32;
-       if(funct3==3'b000)
-           ALU_Control_1=6'b0;
-       else if(funct3==3'b111)
-           ALU_Control_1=6'b000111;//andi
-       else if(funct3==3'b110)
-           ALU_Control_1=6'b000110;//ori
-       else if(funct3==3'b010)
-           ALU_Control_1=6'b000010;//slti
-       else if(funct3==3'b001)
-           ALU_Control_1=6'b000001;//slli (figure out shamt)
-       else if(funct3==3'b011)
-          ALU_Control_1=6'b000010;//sltiu
-       else if(funct3==3'b100)
-           ALU_Control_1=6'b000100;//xori
-       else if(funct3==3'b101)
-               begin
-                   if(funct7==7'b0)
-                   ALU_Control_1=6'b000101;//srli(figure out shamt)
-                   else
-                   ALU_Control_1=6'b001101;//srai(figure out shamt)
-                   end
-      end
-      STORE:
-      begin
-           next_PC_select_1=0;
-           branch_op_1=0;
-           wEn_1=0;
-           wb_sel_1=0;
-           mem_wEn_1=1;
-           imm32_1=s_imm_32;
-           op_A_sel_1=2'b00;
-           op_B_sel_1=1;//make sure if 1 or 0
-           ALU_Control_1=6'b0;  
-      end
-      LOAD:
-         begin
-              next_PC_select_1=0;
-              branch_op_1=0;
-              wEn_1=1;
-              wb_sel_1=1;
-              mem_wEn_1=0;
-              imm32_1=s_imm_32;
-              op_A_sel_1=2'b00;
-              op_B_sel_1=1;//make sure if 1 or 0
-              ALU_Control_1=6'b0;  
-         end
-        BRANCH:
-            begin
-            next_PC_select_1=1;
-            branch_op_1=1;
-            wEn_1=0;
-            wb_sel_1 = 0;
-            mem_wEn_1 = 0;
-            op_A_sel_1 = 2'b00;
-            op_B_sel_1 = 1'b0;
-            imm32_1 = sb_imm_32;
-            if(funct3 == 3'b000)
-                ALU_Control_1 = 6'b010000;
-            else if(funct3 == 3'b001)
-                ALU_Control_1= 6'b010001;
-            else if(funct3 == 3'b100)
-                ALU_Control_1 = 6'b010100;
-            else if(funct3 == 3'b101)
-                ALU_Control_1= 6'b010101;
-            else if(funct3 == 3'b110)
-                ALU_Control_1= 6'b010110;
-            else
-                ALU_Control_1 = 6'b010111;
-            end  
-          JALR:
-            begin
-            next_PC_select_1 = 1;
-            branch_op_1 = 0;
-            wEn_1 = 1;
-            wb_sel_1 = 0;
-            mem_wEn_1 = 0;
-            op_A_sel_1 = 2'b10; //ASK Novak
-            op_B_sel_1 = 1; //ASK Novak
-            imm32_1 = uj_imm_32;
-            ALU_Control_1 = 6'b111111;
-            end
-          JAL:
-            begin
-            next_PC_select_1 = 1;
-            branch_op_1 = 0;
-            wEn_1 = 1;
-            wb_sel_1 = 0;
-            mem_wEn_1 = 0;
-            op_A_sel_1 = 2'b10; //Ask NOvak
-            op_B_sel_1 = 1; //Ask Novak
-            imm32_1 = uj_imm_32;
-            ALU_Control_1 =6'b011111;
-            end
-          AUIPC:
-            begin
-            next_PC_select_1 = 1;
-            branch_op_1 = 0;
-            wEn_1 = 1;
-            wb_sel_1 = 0;
-            mem_wEn_1 = 0;
-            op_A_sel_1 = 2'b01;
-            op_B_sel_1 = 1;
-            imm32_1 = u_imm_32;
-            ALU_Control_1 = 6'b000000;
-            end
-          LUI:
-            begin
-            next_PC_select_1 = 0;
-            branch_op_1 = 0;
-            wEn_1 = 1;
-            wb_sel_1 = 0;
-            mem_wEn_1 = 0;
-            op_A_sel_1 = 2'b00;
-            op_B_sel_1 = 1;
-            imm32_1 = u_imm_32;
-            ALU_Control_1 = 6'b000000;
-            end
-            endcase
-            end
+assign shamt = instruction[24:20];
+assign shamt_32 = {27'b000000000000000000000000000, shamt};
 
-assign next_PC_select =  next_PC_select_1;
-assign branch_op = branch_op_1;
-assign wEn = wEn_1;
-assign wb_sel = wb_sel_1;
-assign mem_wEn = mem_wEn_1;
-assign op_A_sel= op_A_sel_1;
-assign op_B_sel = op_B_sel_1;
-assign imm32 = imm32_1;
-assign ALU_Control = ALU_Control_1;
+assign imm32= (R_TYPE == opcode)? 32'b0:
+
+             (I_TYPE == opcode && funct3 == 3'b001)? shamt_32://SLLI
+             
+             (I_TYPE == opcode && funct3 == 3'b101 && funct7==7'b0)? shamt_32://SRLI
+             
+             (I_TYPE == opcode && funct3 == 3'b101 && funct7==7'b0100000)? shamt_32://SRAI
+             
+             (I_TYPE == opcode)?{{20{instruction[31]}},instruction[31:20]}:
+             
+             (STORE == opcode)? {{20{instruction[31]}},instruction[31:25],instruction[11:7]}:
+             
+             (LOAD == opcode)? {{20{instruction[31]}},instruction[31:20]}:
+             
+             (BRANCH == opcode && branch == 1'b1)? {{19{instruction[31]}},instruction[31],instruction[7],instruction[30:25],instruction[11:8], 1'b0}:
+             
+             (AUIPC == opcode)? {instruction[31:12],12'b0}:
+             
+             (JAL == opcode)? {{11{instruction[31]}},instruction[31],instruction[19:12],instruction[20],instruction[30:21],1'b0}:
+             
+             (LUI == opcode)? {instruction[31:12],12'b0}:
+             
+             (JALR == opcode)? {{20{instruction[31]}},instruction[31:20]}:
+             
+             32'b00000000000000000000000000000100;
+
+assign target_PC = (JALR == opcode)? JALR_target:
+                   (JAL == opcode || BRANCH == opcode)? {{16{PC[15]}},PC} + imm32:
+                   {{16{PC[15]}},PC} +32'b00000000000000000000000000000100;
+                   
+
+assign next_PC_select=(R_TYPE == opcode)? 0:
+                   (I_TYPE == opcode)? 0:
+                   (STORE == opcode)? 0:
+                   (LOAD == opcode)? 0:
+                   (BRANCH == opcode)? 1:
+                   (JAL == opcode)? 1:
+                   (JALR == opcode)? 1:
+                   (AUIPC == opcode)? 1:
+                   (LUI == opcode)? 0:
+                   0;
+
+             assign branch_op=(R_TYPE == opcode)? 0:
+                                 (I_TYPE == opcode)? 0:
+                                 (STORE == opcode)? 0:
+                                 (LOAD == opcode)? 0:
+                                 (BRANCH == opcode)? 1:
+                                 (JAL == opcode)? 0:
+                                 (JALR == opcode)? 0:
+                                 (AUIPC == opcode)? 0:
+                                 (LUI == opcode)? 0:
+                                 0;
+             
+             assign wEn= (R_TYPE == opcode)? 1:
+                         (I_TYPE == opcode)? 1:
+                         (STORE == opcode)? 0:
+                         (LOAD == opcode)? 1:
+                         (BRANCH == opcode)? 0:
+                         (JAL == opcode)? 1:
+                         (JALR == opcode)? 1:
+                         (AUIPC == opcode)? 1:
+                         (LUI == opcode)? 1:
+                         0;
+             
+             assign op_A_sel=(R_TYPE == opcode)? 2'b00://we need to make sure of this
+                             (I_TYPE == opcode)? 2'b00:
+                             (STORE == opcode)? 2'b00:
+                             (LOAD == opcode)? 2'b00:
+                             (BRANCH == opcode)? 2'b00: 
+                             (JAL == opcode)? 2'b10:
+                             (JALR == opcode)? 2'b10:
+                             (AUIPC == opcode)? 2'b01:
+                             (LUI == opcode)? 2'b11:
+                             0;
+             
+             assign op_B_sel=(R_TYPE == opcode)? 0://we need to make sure of this
+                             (I_TYPE == opcode)? 1:
+                             (STORE == opcode)? 1:
+                             (LOAD == opcode)? 1:
+                             (BRANCH == opcode)? 0: 
+                             (JAL == opcode)? 1:
+                             (JALR == opcode)? 1:
+                             (AUIPC == opcode)? 1:
+                             (LUI == opcode)? 1:
+                             0;
+//         
+             assign mem_wEn= (R_TYPE == opcode)? 0:
+                             (I_TYPE == opcode)? 0:
+                             (STORE == opcode)? 1:
+                             (LOAD == opcode)? 0:
+                             (BRANCH == opcode)? 0:
+                             (JAL == opcode)? 0:
+                             (JALR == opcode)? 0:
+                             (AUIPC == opcode)? 0:
+                             (LUI == opcode)? 0:
+                             0;
+             assign wb_sel=  (R_TYPE == opcode)? 0:
+                             (I_TYPE == opcode)? 0:
+                             (STORE == opcode)? 0:
+                             (LOAD == opcode)? 1:
+                             (BRANCH == opcode)? 0:
+                             (JAL == opcode)? 0:
+                             (JALR == opcode)? 0:
+                             (AUIPC == opcode)? 0:
+                             (LUI == opcode)? 0:
+                             0;
+
+assign ALU_Control=(R_TYPE == opcode&&funct3==3'b000&&funct7==7'b0)?6'b0:/*add*/
+                  (R_TYPE == opcode&&funct3==3'b000&&funct7==7'b0100000)?6'b001000://sub
+                  (R_TYPE == opcode&&funct3==3'b111)?6'b000111://and
+                  (R_TYPE == opcode&&funct3==3'b110)?6'b000110://or
+                  (R_TYPE == opcode&&funct3==3'b010)?6'b000010://slt
+                  (R_TYPE == opcode&&funct3==3'b001)?6'b000001://sll
+                  (R_TYPE == opcode&&funct3==3'b011)?6'b000011://sltu
+                  (R_TYPE == opcode&&funct3==3'b100)?6'b000100://xor
+                  (R_TYPE == opcode&&funct3==3'b101&&funct7==7'b0)?6'b000101:/*srl*/
+                  (R_TYPE == opcode&&funct3==3'b101&&funct7==7'b0100000)?6'b001101://sra
+
+                  (I_TYPE == opcode&&funct3==3'b000)?6'b0://addi
+                  (I_TYPE == opcode&&funct3==3'b111)?6'b000111://andi
+                  (I_TYPE == opcode&&funct3==3'b110)?6'b000110://ori
+                  (I_TYPE == opcode&&funct3==3'b010)?6'b000010://slti
+                  (I_TYPE == opcode&&funct3==3'b001)?6'b000001://slli
+                  (I_TYPE == opcode&&funct3==3'b011)?6'b000011://sltiu
+                  (I_TYPE == opcode&&funct3==3'b100)?6'b000100://xori
+                  (I_TYPE == opcode&&funct3==3'b101&&funct7==7'b0)?6'b000101://srli
+                  (I_TYPE == opcode&&funct3==3'b101&&funct7==7'b0100000)?6'b001101://srai
+
+                  (STORE == opcode)? 6'b0:
+
+                  (LOAD == opcode)? 6'b0:
+
+                  (BRANCH == opcode&&funct3 == 3'b000)?6'b010000://beq
+                  (BRANCH == opcode&&funct3 == 3'b001)?6'b010001://bne
+                  (BRANCH == opcode&&funct3 == 3'b100)?6'b010100://blt
+                  (BRANCH == opcode&&funct3 == 3'b101)?6'b010101://bge
+                  (BRANCH == opcode&&funct3 == 3'b110)?6'b010110://bltu
+                  (BRANCH == opcode&&funct3 == 3'b111)?6'b010111://bgeu
+
+                  (JAL == opcode)? 6'b011111:
+
+                  (JALR == opcode)? 6'b111111:
+
+                  (AUIPC == opcode)? 6'b000000:
+
+                  (LUI == opcode)? 6'b000000:
+
+                  6'b0;
+ 
+    
+    
+    
+/******************************************************************************
+*                      Start Your Code Here
+******************************************************************************/
 
 endmodule

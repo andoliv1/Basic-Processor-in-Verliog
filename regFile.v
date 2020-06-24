@@ -1,5 +1,7 @@
-//Name: Layan Bahaidarah
-//BU ID: U26666743
+// Name: Layan Bahaidarah Andreas Francisco
+// BU ID: U26666743 U85066104
+// EC413 Lab 2 Problem 1: Register File module
+
 module regFile (
   input clock,
   input reset,
@@ -25,7 +27,7 @@ always@(reset) begin
 
 always@(posedge clock) begin
 
-        if(wEn) begin
+        if(wEn & write_sel!=5'b0) begin
         reg_file[write_sel]<=write_data;
 end
 end
